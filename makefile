@@ -1,17 +1,34 @@
-CXXFLAG = -g -Werror -std=c++11
-CXX = clang
-LIBS =
+CXXFLAG = -g -isystem -Werror -Wextra -std=c++11
+CXX = g++
 
-SRCS := engine_impl.cc table.cc tx_manager.cc
-MAIN := perf_main.cc
-OBJS := $(SRCS:.cc=.o)
-DEPS := $(OBJS:.o=.d)
+OBJS := *.o
 
-TESTFLAG = -l$(GTEST)/lib/gtest_main -I $(GTEST)/include
+TESTHDRS = -I $(GTEST)/include/
+TESTFLAG = $(GTEST)/lib/libgtest_main.a $(GTEST)/lib/libgtest.a -lpthread
 
+record.o: record.cc
+	$(CXX) $(CXXFLAG) $(TESTHDRS) -c record.cc
 
-hash_test: hash_table_test.cc hash_table.h
-	$(CXX) $(CXXFLAG) $(TESTFLAG) hash_table_test.cc -o hash_table_test
+table.o: table.cc
+	$(CXX) $(CXXFLAG) $(TESTHDRS) -c table.cc
+
+transcation.o: transcation.cc
+	$(CXX) $(CXXFLAG) $(TESTHDRS) -c transcation.cc
+
+engine.o: engine.cc
+	$(CXX) $(CXXFLAG) $(TESTHDRS) -c engine.cc
+
+main.o: main.cc engine.h
+	$(CXX) $(CXXFLAG) $(TESTHDRS) -c main.cc
+
+hash_table_test.o: hash_table_test.cc hash_table.h
+	$(CXX) $(CXXFLAG) $(TESTHDRS) -c hash_table_test.cc
+
+hash_table_test: hash_table_test.o
+	$(CXX) $(CXXFLAG) $(TESTFLAG) hash_table_test.o -o hash_table_test
+
+all: main.o engine.o record.o transcation.o table.o
+	$(CXX) $(CXXFLAG) $(TESTFLAG) $^ -o perftest
 
 clean:
 	rm *.o
