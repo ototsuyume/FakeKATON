@@ -12,7 +12,7 @@
 namespace FakeKATON{
   class EngineImpl :public Engine{
   public:
-    EngineImpl(const unordered_map<string, RecordType> &table_definition);
+    EngineImpl(const unordered_map<string, RecordType> &fields);
     ~EngineImpl();
 
     virtual shared_ptr<Transcation> BeginTranscation();
@@ -33,9 +33,14 @@ namespace FakeKATON{
     shared_ptr<Table> table_;
   };
 
-  EngineImpl::EngineImpl(const unordered_map<string, RecordType> &table_definition){
-
+  shared_ptr<Engine> Engine::NewEngine(const unordered_map<string, RecordType> &fields){
+    return shared_ptr<Engine>(new EngineImpl(fields));
   }
+
+  EngineImpl::EngineImpl(const unordered_map<string, RecordType> &fields){  
+    table_ = shared_ptr<Table>(new Table(10240, fields));
+  }
+
   EngineImpl::~EngineImpl(){
 
   }
@@ -53,7 +58,7 @@ namespace FakeKATON{
   }
 
   shared_ptr<Transcation> EngineImpl::BeginTranscation(){
-    return Transcation::BeginTranscation(global_tid_.fetch_add(1), 
+    return Transcation::BeginTranscation(global_tid_.fetch_add(1),
       GetCurrentTimestamp(), table_);
   }
 

@@ -22,7 +22,7 @@ namespace FakeKATON{
 
   class Table{
   public:
-    Table(size_t size,  shared_ptr<vector<FieldDef>> fields);
+    Table(size_t size, const unordered_map<string, RecordType> &fields);
     ~Table();
     
     shared_ptr<Record> NewRecord(const string &key, Tid tid);

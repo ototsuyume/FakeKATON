@@ -1,8 +1,11 @@
 #include "table.h"
 
 namespace FakeKATON{
-  Table::Table(size_t size, shared_ptr<vector<FieldDef>> fields) :index_(size),
-  fields_(fields),field2pos_(new unordered_map<string,int>()) {
+  Table::Table(size_t size, const unordered_map<string, RecordType> &fields) :index_(size)
+    ,field2pos_(new unordered_map<string,int>()) {
+    shared_ptr<vector<FieldDef>> fields_ = shared_ptr<vector<FieldDef>>(new vector<FieldDef>());
+    for (const auto &item : fields)
+      fields_->emplace_back(FieldDef{ item.first, item.second });
     for (size_t i = 0; i < fields_->size(); i++)
       (*field2pos_)[fields_->at(i).fname_] = i;
   }
