@@ -1,5 +1,5 @@
 #ifndef _WIN32
-#include <time.h>
+#include <sys/time.h>
 #else
 #include <ctime>
 #endif
@@ -48,9 +48,10 @@ namespace FakeKATON{
   uint64_t EngineImpl::GetCurrentTimestamp(){
     uint64_t timestamp;
 #ifndef _WIN32
-    timespec tsp;
-    clock_gettime(CLOCK_REALTIME, &tsp);
-    timestamp = tsp.tv_nsec
+    timeval tv;
+    gettimeofday(&tv,NULL);
+    timestamp = 1000000 * tv.tv_sec + tv.tv_usec;
+
 #else
     timestamp = time(nullptr);
 #endif

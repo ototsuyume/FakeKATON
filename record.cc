@@ -16,6 +16,21 @@ namespace FakeKATON{
     val_[pos] = val;
     return true;
   }
+  
+  const shared_ptr<FieldBase> Record::GetFieldValue(const string& field) const{
+    if(field2pos_->find(field)==field2pos_->end())
+      return nullptr;
+    return val_[field2pos_->at(field)];
+  }
+  
+  shared_ptr<Record> Record::GetPrev(){
+    return prev_;
+  }
+  
+  const shared_ptr<vector<FieldDef>> Record::GetFields() const{
+    return fields_;
+  }
+
 
   bool Record::SetPrev(shared_ptr<Record> newprev){
     prev_ = newprev;

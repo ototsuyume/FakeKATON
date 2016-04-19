@@ -26,7 +26,7 @@ namespace FakeKATON{
 
   public:
     HashTable(size_t);
-    virtual ~HashTable();
+    virtual ~HashTable(){};
 
     bool GetValue(const KEY&, VAL&) const;
     bool SetValue(const KEY&, const VAL&);

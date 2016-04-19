@@ -103,7 +103,7 @@ namespace FakeKATON{
     void SetUnvisible();
 
     bool CheckVisibility(Tid tid, uint64_t ts) const;
-    const vector<FieldDef>& GetFields() const;
+    const shared_ptr<vector<FieldDef>> GetFields() const;
     const shared_ptr<FieldBase> GetFieldValue(const string& field) const;
 
   private:
