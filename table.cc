@@ -3,7 +3,7 @@
 namespace FakeKATON{
   Table::Table(size_t size, const unordered_map<string, RecordType> &fields) :index_(size)
     ,field2pos_(new unordered_map<string,int>()) {
-    shared_ptr<vector<FieldDef>> fields_ = shared_ptr<vector<FieldDef>>(new vector<FieldDef>());
+    fields_ = shared_ptr<vector<FieldDef>>(new vector<FieldDef>());
     for (const auto &item : fields)
       fields_->emplace_back(FieldDef{ item.first, item.second });
     for (size_t i = 0; i < fields_->size(); i++)
@@ -27,14 +27,16 @@ namespace FakeKATON{
         return nullptr;
     ret->SetPrev(head);
     ret->SetbeginToTid(tid);
-
-    for (auto &field : head->GetFields()){
-      auto val = head->GetFieldValue(field.fname_)->CopyValue();
-      ret->SetFieldValue(field.fname_, val);
+    if (head.get()){
+      for (auto iter = fields_->begin();
+        iter != fields_->end(); iter++){
+        auto val = head->GetFieldValue(iter->fname_)->CopyValue();
+        ret->SetFieldValue(iter->fname_, val);
+      }
     }
     
     if (atomic_compare_exchange_strong(&entry->data_, &head, ret))
-      return head;
+      return ret;
     else
       return nullptr;
   }

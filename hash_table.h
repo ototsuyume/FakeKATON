@@ -56,6 +56,7 @@ namespace FakeKATON{
         if (key == *entry.key_){
           val = *entry.val_;
         }
+        return true;
       case EntryType::EDeleted:
         if (++reprobe == size)
           return false;
@@ -70,7 +71,7 @@ namespace FakeKATON{
   template<typename KEY,typename VAL>
   bool HashTable<KEY, VAL>::SetValue(const KEY &key,  const VAL &val){
     int hash_val = hash<KEY>()(key);
-    size_t size = table_.size() / 2, reprobe = 0;
+    size_t size = table_.size(), reprobe = 0;
     int index = hash_val % size;
 
     auto pval = shared_ptr<VAL>(new VAL(val));
