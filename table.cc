@@ -30,8 +30,11 @@ namespace FakeKATON{
     if (head.get()){
       for (auto iter = fields_->begin();
         iter != fields_->end(); iter++){
-        auto val = head->GetFieldValue(iter->fname_)->CopyValue();
-        ret->SetFieldValue(iter->fname_, val);
+        auto val = head->GetFieldValue(iter->fname_);
+        if (val.get()){
+          auto cval = val->CopyValue();
+          ret->SetFieldValue(iter->fname_, cval);
+        }
       }
     }
     
