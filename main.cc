@@ -1,6 +1,42 @@
 #include "engine.h"
 
 #define ERROR(msg, ... ) {fprintf(stderr, "ERROR [%d] "msg, __LINE__, ##__VA_ARGS__);exit(0);}
+#define LOG(msg, ... ) {fprintf(stderr,"INFO [%d] "msg, __LINE__, ##__VA_ARGS__);}
+
+#define CHECK_STR(a, b) {\
+  if(a!=b)\
+    LOG("Check error. %s != %s\n", a.c_str(), b.c_str()); \
+}
+
+#define CHECK_INT(a, b) {\
+  if(a!=b)\
+    LOG("Check error. %d != %d\n", a, b); \
+}
+
+#define CHECK_FLOAT(a, b) {\
+  if((a>b&&a-b>0.000001)||(b>a&&b-a>0.000001)) \
+    LOG("Check error. %.03f != %.03f\n", a, b); \
+}
+
+void WriteData(shared_ptr<FakeKATON::Engine> db,
+  const string &key, const string &address, int64_t phone, double data){
+  if (!db->WriteString(key, "address", address))
+    ERROR("Write string failed.\n");
+  if (!db->WriteInt(key, "phone", phone))
+    ERROR("Write int failed.\n");
+  if (!db->WriteFloat(key, "data", data))
+    ERROR("Write float failed.\n");
+}
+
+void ReadData(shared_ptr<FakeKATON::Engine> db,
+  const string &key, string &address, int64_t &phone, double &data) {
+  if (!db->ReadString(key, "address", address))
+    ERROR("Read string failed.\n");
+  if (!db->ReadInt(key, "phone", phone))
+    ERROR("Read int failed.\n");
+  if (!db->ReadFloat(key, "data", data))
+    ERROR("Read float failed.\n");
+}
 
 int main(){
   unordered_map<string, FakeKATON::RecordType> fields;
@@ -8,38 +44,17 @@ int main(){
   fields["phone"] = FakeKATON::RecordType::rtInt;
   fields["data"] = FakeKATON::RecordType::rtFloat;
   auto db = FakeKATON::Engine::NewEngine(fields);
-  string key = "Andrew", field = "address", value = "101 No.1 Street",rval;
-  if (!db->WriteString(key, field, value))
-    ERROR("Write string failed.\n");
-  field = "phone";
-  if (!db->WriteInt(key, field, 1234567))
-    ERROR("Write int failed.\n");
-  field = "data";
-  if (!db->WriteFloat(key, field, 1.23456))
-    ERROR("Write float failed.\n");
 
-  if (!db->ReadString(key, field, rval))
-    ERROR("Read string failed.\n");
-  printf("Read address: %s\n",rval.c_str());
+  // Test basic operation.
+  string key = "Andrew", addr = "101 No.1 Street", eaddr;
+  int64_t phone = 2937123, ephone;
+  double data = 3.1415, edata;
+  WriteData(db, key, addr, phone, data);
+  ReadData(db, key, eaddr, ephone, edata);
   
-  field = "address";
-  value = "102 No. 2 Street";
-  if (!db->WriteString(key, field, value))
-    ERROR("Write string failed.\n");
-  if (!db->ReadString(key, field, rval))
-    ERROR("Read string failed.\n");
-  printf("Read: %s\n", rval);
+  CHECK_STR(addr, eaddr);
+  CHECK_INT(phone, ephone);
+  CHECK_FLOAT(data, edata);
 
-  int64_t iv;
-  field = "phone";
-  if (!db->ReadInt(key,field,iv))
-    ERROR("Read int failed.\n");
-  printf("Read: %d\n", iv);
-
-  double fv;
-  field = "data";
-  if (!db->ReadFloat(key, field, fv))
-    ERROR("Read float failed.\n");
-  printf("Read: %.3f\n", fv);
   return 0;
 }
